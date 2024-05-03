@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:splash_view/splash_view.dart';
-import 'package:zap_sem_contato/modules/views/send-message-screen.dart';
+import 'package:zap_sem_contato/modules/views/send_message_screen.dart';
 
 class SplashScreen extends StatelessWidget {
   const SplashScreen({super.key});

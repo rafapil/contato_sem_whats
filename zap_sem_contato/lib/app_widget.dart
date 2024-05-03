@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:zap_sem_contato/modules/views/send-message-screen.dart';
+import 'package:zap_sem_contato/modules/views/send_message_screen.dart';
 
 import 'modules/splash/splash_screen.dart';
 import 'shared/themes/app_colors.dart';
