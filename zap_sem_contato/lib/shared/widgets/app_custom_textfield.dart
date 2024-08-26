@@ -5,7 +5,7 @@ import '../themes/app_textstyles.dart';
 
 class AppCustomTextField extends StatelessWidget {
   final String title;
-  final String hint;
+  final String? hint;
   final TextEditingController? textEditingController;
   final TextInputType type;
   final bool oculto;
@@ -14,7 +14,7 @@ class AppCustomTextField extends StatelessWidget {
   const AppCustomTextField(
       {Key? key,
       this.title = '',
-      required this.hint,
+      this.hint,
       this.textEditingController,
       required this.type,
       this.oculto = false,

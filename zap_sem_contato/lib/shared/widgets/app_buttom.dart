@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:zap_sem_contato/shared/themes/app_colors.dart';
 
 class AppButtom extends StatelessWidget {
   final double width;
@@ -20,7 +21,7 @@ class AppButtom extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        border: Border.all(width: 2.0, color: Colors.black),
+        border: Border.all(width: 0.8, color: AppColors.white),
         color: color,
         borderRadius: BorderRadius.circular(5.0),
       ),
@@ -28,8 +29,9 @@ class AppButtom extends StatelessWidget {
       width: width,
       child: TextButton(
         // ignore: prefer_const_constructors
-        child: Text(textoButtom, style: buttomStyle),
         onPressed: function,
+        // ignore: prefer_const_constructors
+        child: Text(textoButtom, style: buttomStyle),
       ),
     );
   }

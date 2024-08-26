@@ -1,20 +1,36 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:splash_view/splash_view.dart';
-import 'package:zap_sem_contato/modules/views/send_message_screen.dart';
+import 'package:zap_sem_contato/shared/themes/app_colors.dart';
+import 'package:zap_sem_contato/shared/themes/app_images.dart';
 
-class SplashScreen extends StatelessWidget {
+class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
+
+  @override
+  State<SplashScreen> createState() => _SplashScreenState();
+}
+
+class _SplashScreenState extends State<SplashScreen> {
+  @override
+  void initState() {
+    Timer(const Duration(seconds: 3), () {
+      Navigator.pushNamedAndRemoveUntil(context, '/message', (route) => false);
+    });
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: SplashView(
-        backgroundColor: Colors.red,
-        loadingIndicator: const RefreshProgressIndicator(),
-        logo: const FlutterLogo(),
-        done: Done(SendMessageScreen()),
+      home: Scaffold(
+        backgroundColor: AppColors.background,
+        body: Center(
+          child: Image.asset(
+            AppImages.logoImageApp,
+            height: 180,
+          ),
+        ),
       ),
     );
-    // );
   }
 }

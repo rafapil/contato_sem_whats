@@ -13,8 +13,14 @@ class AppTextStyles {
   );
 
   static final txtButtomWhite = GoogleFonts.notoSans(
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: FontWeight.w700,
+    color: AppColors.white,
+  );
+
+  static final txtTitleWhite = GoogleFonts.notoSans(
+    fontSize: 16,
+    fontWeight: FontWeight.w600,
     color: AppColors.white,
   );
 
