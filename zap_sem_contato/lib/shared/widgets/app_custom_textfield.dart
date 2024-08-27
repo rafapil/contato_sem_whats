@@ -1,6 +1,4 @@
-// import 'package:comunica_ti/shared/themes/themes.dart';
 import 'package:flutter/material.dart';
-
 import '../themes/app_textstyles.dart';
 
 class AppCustomTextField extends StatelessWidget {

@@ -37,7 +37,7 @@ class _SendMessageScreenState extends State<SendMessageScreen> {
           ))
       .toList();
 
-  String _selectedValue = "+55";
+  String _selectedValue = '+55';
 
   @override
   Widget build(BuildContext context) {
@@ -66,161 +66,161 @@ class _SendMessageScreenState extends State<SendMessageScreen> {
           ],
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            const SizedBox(
-              height: 20,
-            ),
-            Row(
-              children: [
-                Text(
-                  AppStrings.insertNumberContact,
-                  style: AppTextStyles.txtTextForm,
-                ),
-              ],
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              mainAxisSize: MainAxisSize.max,
-              children: [
-                SizedBox(
-                  width: 80,
-                  child: DropdownButtonFormField(
-                      isExpanded: true,
-                      menuMaxHeight: double.maxFinite / 2,
-                      decoration: InputDecoration(
-                        enabledBorder: OutlineInputBorder(
-                          borderSide:
-                              const BorderSide(color: Colors.grey, width: 1),
-                          borderRadius: BorderRadius.circular(5),
-                        ),
-                        border: OutlineInputBorder(
-                          borderSide:
-                              const BorderSide(color: Colors.grey, width: 1),
-                          borderRadius: BorderRadius.circular(5),
-                        ),
-                        filled: true,
-                        fillColor: Colors.white,
-                      ),
-                      // hint: const Text('Selecione o tipo de ocorrência'),
-                      // disabledHint:
-                      //     const Text('Selecione o tipo de ocorrência'),
-                      dropdownColor: Colors.white,
-                      value: _selectedValue,
-                      onChanged: (String? newValue) {
-                        setState(() {
-                          _selectedValue = newValue!;
-                        });
-                      },
-                      items: items),
-                ),
-                const SizedBox(width: 10),
-                SizedBox(
-                  width: 250,
-                  child: AppCustomTextField(
-                    textEditingController: phoneEdittingController,
-                    hint: AppStrings.hintTextPhoneCall,
-                    type: TextInputType.phone,
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              const SizedBox(
+                height: 20,
+              ),
+              Row(
+                children: [
+                  Text(
+                    AppStrings.insertNumberContact,
+                    style: AppTextStyles.txtTextForm,
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(
-              height: 40,
-            ),
-            AppCustomMultilinetext(
-              type: TextInputType.multiline,
-              hint: AppStrings.hintMessageNotrequired,
-              titulo: AppStrings.titleMessageNotrequired,
-              textEditingController: messageEdittingController,
-            ),
-            const SizedBox(
-              height: 30,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Column(
-                  children: [
-                    AppButtom(
-                      buttomStyle: AppTextStyles.txtButtomWhite,
-                      color: AppColors.primary,
-                      textoButtom: AppStrings.btnCallContact,
-                      width: 300,
-                      function: () {
-                        _sendMessageController.sendMessageNoContact(
-                            ddi: _selectedValue,
-                            phoneNumber: phoneEdittingController.text,
-                            message: messageEdittingController.text,
-                            tipeLink: false);
-                      },
+                ],
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisSize: MainAxisSize.max,
+                children: [
+                  SizedBox(
+                    width: 80,
+                    child: DropdownButtonFormField(
+                        isExpanded: true,
+                        menuMaxHeight: double.maxFinite / 2,
+                        decoration: InputDecoration(
+                          enabledBorder: OutlineInputBorder(
+                            borderSide:
+                                const BorderSide(color: Colors.grey, width: 1),
+                            borderRadius: BorderRadius.circular(5),
+                          ),
+                          border: OutlineInputBorder(
+                            borderSide:
+                                const BorderSide(color: Colors.grey, width: 1),
+                            borderRadius: BorderRadius.circular(5),
+                          ),
+                          filled: true,
+                          fillColor: Colors.white,
+                        ),
+                        dropdownColor: Colors.white,
+                        value: _selectedValue,
+                        onChanged: (String? newValue) {
+                          setState(() {
+                            _selectedValue = newValue!;
+                          });
+                        },
+                        items: items),
+                  ),
+                  const SizedBox(width: 10),
+                  SizedBox(
+                    width: 250,
+                    child: AppCustomTextField(
+                      textEditingController: phoneEdittingController,
+                      hint: AppStrings.hintTextPhoneCall,
+                      type: TextInputType.phone,
                     ),
-                    const SizedBox(
-                      height: 20,
-                    ),
-                    AppButtom(
-                      buttomStyle: AppTextStyles.txtButtomWhite,
-                      color: AppColors.primary,
-                      textoButtom: AppStrings.btnLinkContact,
-                      width: 300,
-                      function: () async {
-                        linkContact =
-                            await _sendMessageController.sendMessageNoContact(
-                                ddi: _selectedValue,
-                                phoneNumber: phoneEdittingController.text,
-                                message: messageEdittingController.text,
-                                tipeLink: true);
-                        linkContactEdittingController.text =
-                            linkContact.toString();
-                      },
-                    ),
-                    const SizedBox(
-                      height: 40,
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            Column(
-              children: [
-                AppCustomTextField(
-                  type: TextInputType.text,
-                  textEditingController: linkContactEdittingController,
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
-                AppButtom(
-                  buttomStyle: AppTextStyles.txtButtomWhite,
-                  color: AppColors.primary,
-                  textoButtom: AppStrings.btnCopyLink,
-                  width: 300,
-                  function: () => _sendMessageController
-                      .copyToClipboard(linkContactEdittingController.text),
-                ),
-              ],
-            ),
-          ],
+                  ),
+                ],
+              ),
+              const SizedBox(
+                height: 40,
+              ),
+              AppCustomMultilinetext(
+                type: TextInputType.multiline,
+                hint: AppStrings.hintMessageNotrequired,
+                titulo: AppStrings.titleMessageNotrequired,
+                textEditingController: messageEdittingController,
+              ),
+              const SizedBox(
+                height: 30,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Column(
+                    children: [
+                      AppButtom(
+                        buttomStyle: AppTextStyles.txtButtomWhite,
+                        color: AppColors.primary,
+                        textoButtom: AppStrings.btnCallContact,
+                        width: 300,
+                        function: () {
+                          _sendMessageController.sendMessageNoContact(
+                              ddi: _selectedValue,
+                              phoneNumber: phoneEdittingController.text,
+                              message: messageEdittingController.text,
+                              tipeLink: false);
+                        },
+                      ),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      AppButtom(
+                        buttomStyle: AppTextStyles.txtButtomWhite,
+                        color: AppColors.primary,
+                        textoButtom: AppStrings.btnLinkContact,
+                        width: 300,
+                        function: () async {
+                          linkContact =
+                              await _sendMessageController.sendMessageNoContact(
+                                  ddi: _selectedValue,
+                                  phoneNumber: phoneEdittingController.text,
+                                  message: messageEdittingController.text,
+                                  tipeLink: true);
+                          linkContactEdittingController.text =
+                              linkContact.toString();
+                        },
+                      ),
+                      const SizedBox(
+                        height: 40,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              Column(
+                children: [
+                  AppCustomTextField(
+                    type: TextInputType.text,
+                    textEditingController: linkContactEdittingController,
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  AppButtom(
+                    buttomStyle: AppTextStyles.txtButtomWhite,
+                    color: AppColors.primary,
+                    textoButtom: AppStrings.btnCopyLink,
+                    width: 300,
+                    function: () => _sendMessageController
+                        .copyToClipboard(linkContactEdittingController.text),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
       bottomSheet: Padding(
         padding: const EdgeInsets.only(
-          left: 16,
-          bottom: 2,
-          top: 2,
+          left: 8,
         ),
         child: Row(
           children: [
             TextButton(
-              onPressed: () {},
-              // onPressed: () => _sendMessageController.copyToClipboard(text),
-              child: Text(AppStrings.btnDonatePix),
+              onPressed: () =>
+                  _sendMessageController.redirectUrl(AppStrings.linkVaquinha),
+              child: Text(
+                AppStrings.btnDonate,
+                style: AppTextStyles.txtTextLink,
+              ),
             ),
           ],
         ),
