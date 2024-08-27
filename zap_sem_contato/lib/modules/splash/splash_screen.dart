@@ -13,22 +13,20 @@ class SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
+    super.initState();
     Timer(const Duration(seconds: 3), () {
       Navigator.pushNamedAndRemoveUntil(context, '/message', (route) => false);
     });
-    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        backgroundColor: AppColors.background,
-        body: Center(
-          child: Image.asset(
-            AppImages.logoImageApp,
-            height: 180,
-          ),
+    return Scaffold(
+      backgroundColor: AppColors.background,
+      body: Center(
+        child: Image.asset(
+          AppImages.logoImageApp,
+          height: 180,
         ),
       ),
     );

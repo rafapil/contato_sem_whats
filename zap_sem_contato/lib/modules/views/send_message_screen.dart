@@ -7,6 +7,7 @@ import 'package:zap_sem_contato/shared/themes/app_textstyles.dart';
 import '../../shared/widgets/app_buttom.dart';
 import '../../shared/widgets/app_custom_multilinetext.dart';
 import '../../shared/widgets/app_custom_textfield.dart';
+import '../../shared/widgets/app_strings.dart';
 
 class SendMessageScreen extends StatefulWidget {
   const SendMessageScreen({super.key});
@@ -59,7 +60,7 @@ class _SendMessageScreenState extends State<SendMessageScreen> {
               width: 10,
             ),
             Text(
-              'Zap sem contato',
+              AppStrings.appTitle,
               style: AppTextStyles.txtTitleWhite,
             )
           ],
@@ -76,7 +77,7 @@ class _SendMessageScreenState extends State<SendMessageScreen> {
             Row(
               children: [
                 Text(
-                  'Insira o número para contato',
+                  AppStrings.insertNumberContact,
                   style: AppTextStyles.txtTextForm,
                 ),
               ],
@@ -107,9 +108,9 @@ class _SendMessageScreenState extends State<SendMessageScreen> {
                         filled: true,
                         fillColor: Colors.white,
                       ),
-                      hint: const Text('Selecione o tipo de ocorrência'),
-                      disabledHint:
-                          const Text('Selecione o tipo de ocorrência'),
+                      // hint: const Text('Selecione o tipo de ocorrência'),
+                      // disabledHint:
+                      //     const Text('Selecione o tipo de ocorrência'),
                       dropdownColor: Colors.white,
                       value: _selectedValue,
                       onChanged: (String? newValue) {
@@ -124,7 +125,7 @@ class _SendMessageScreenState extends State<SendMessageScreen> {
                   width: 250,
                   child: AppCustomTextField(
                     textEditingController: phoneEdittingController,
-                    hint: 'Digite o ddd + telefone',
+                    hint: AppStrings.hintTextPhoneCall,
                     type: TextInputType.phone,
                   ),
                 ),
@@ -135,8 +136,8 @@ class _SendMessageScreenState extends State<SendMessageScreen> {
             ),
             AppCustomMultilinetext(
               type: TextInputType.multiline,
-              hint: 'Mensagem não obrigatorio!',
-              titulo: 'Mensagem (não obrigatorio)',
+              hint: AppStrings.hintMessageNotrequired,
+              titulo: AppStrings.titleMessageNotrequired,
               textEditingController: messageEdittingController,
             ),
             const SizedBox(
@@ -150,7 +151,7 @@ class _SendMessageScreenState extends State<SendMessageScreen> {
                     AppButtom(
                       buttomStyle: AppTextStyles.txtButtomWhite,
                       color: AppColors.primary,
-                      textoButtom: 'Chamar contato',
+                      textoButtom: AppStrings.btnCallContact,
                       width: 300,
                       function: () {
                         _sendMessageController.sendMessageNoContact(
@@ -166,7 +167,7 @@ class _SendMessageScreenState extends State<SendMessageScreen> {
                     AppButtom(
                       buttomStyle: AppTextStyles.txtButtomWhite,
                       color: AppColors.primary,
-                      textoButtom: 'Criar link para contato',
+                      textoButtom: AppStrings.btnLinkContact,
                       width: 300,
                       function: () async {
                         linkContact =
@@ -198,7 +199,7 @@ class _SendMessageScreenState extends State<SendMessageScreen> {
                 AppButtom(
                   buttomStyle: AppTextStyles.txtButtomWhite,
                   color: AppColors.primary,
-                  textoButtom: 'Copiar link',
+                  textoButtom: AppStrings.btnCopyLink,
                   width: 300,
                   function: () => _sendMessageController
                       .copyToClipboard(linkContactEdittingController.text),
@@ -218,7 +219,8 @@ class _SendMessageScreenState extends State<SendMessageScreen> {
           children: [
             TextButton(
               onPressed: () {},
-              child: Text('Contribua com nosso trabalho - Faz um PIX!'),
+              // onPressed: () => _sendMessageController.copyToClipboard(text),
+              child: Text(AppStrings.btnDonatePix),
             ),
           ],
         ),
