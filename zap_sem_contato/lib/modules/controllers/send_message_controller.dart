@@ -5,17 +5,21 @@ import 'package:whatsapp_unilink/whatsapp_unilink.dart';
 class SendMessageController {
   Future<dynamic> sendMessageNoContact(
       {ddi, phoneNumber, message, tipeLink}) async {
-    String comprelePhoneNumber = ddi + phoneNumber;
+    if (phoneNumber.length > 6) {
+      String comprelePhoneNumber = ddi + phoneNumber;
 
-    final link = WhatsAppUnilink(
-      phoneNumber: comprelePhoneNumber,
-      text: message,
-    );
+      final link = WhatsAppUnilink(
+        phoneNumber: comprelePhoneNumber,
+        text: message,
+      );
 
-    if (tipeLink) {
-      return link;
+      if (tipeLink) {
+        return link;
+      } else {
+        await launchUrl(link.asUri());
+      }
     } else {
-      await launchUrl(link.asUri());
+      return null;
     }
   }
 

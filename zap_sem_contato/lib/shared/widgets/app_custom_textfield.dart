@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import '../themes/app_textstyles.dart';
 
 class AppCustomTextField extends StatelessWidget {
+  final int? maxLength;
   final String title;
   final String? hint;
   final TextEditingController? textEditingController;
   final TextInputType type;
   final bool oculto;
+  final bool enabled;
   final Function? validator;
 
   const AppCustomTextField(
@@ -16,7 +18,9 @@ class AppCustomTextField extends StatelessWidget {
       this.textEditingController,
       required this.type,
       this.oculto = false,
-      this.validator})
+      this.validator,
+      this.enabled = true,
+      this.maxLength})
       : super(key: key);
 
   @override
@@ -32,6 +36,8 @@ class AppCustomTextField extends StatelessWidget {
             : Container(),
         // SizedBox(height: 5),
         TextFormField(
+          maxLength: maxLength,
+          enabled: enabled,
           keyboardType: type,
           obscureText: oculto,
           decoration: InputDecoration(

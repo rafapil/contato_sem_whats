@@ -83,9 +83,6 @@ class _SendMessageScreenState extends State<SendMessageScreen> {
                   ),
                 ],
               ),
-              const SizedBox(
-                height: 10,
-              ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 mainAxisSize: MainAxisSize.max,
@@ -121,10 +118,14 @@ class _SendMessageScreenState extends State<SendMessageScreen> {
                   const SizedBox(width: 10),
                   SizedBox(
                     width: 250,
-                    child: AppCustomTextField(
-                      textEditingController: phoneEdittingController,
-                      hint: AppStrings.hintTextPhoneCall,
-                      type: TextInputType.phone,
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 20.0),
+                      child: AppCustomTextField(
+                        textEditingController: phoneEdittingController,
+                        hint: AppStrings.hintTextPhoneCall,
+                        type: TextInputType.phone,
+                        maxLength: 11,
+                      ),
                     ),
                   ),
                 ],
@@ -152,11 +153,38 @@ class _SendMessageScreenState extends State<SendMessageScreen> {
                         textoButtom: AppStrings.btnCallContact,
                         width: 300,
                         function: () {
-                          _sendMessageController.sendMessageNoContact(
-                              ddi: _selectedValue,
-                              phoneNumber: phoneEdittingController.text,
-                              message: messageEdittingController.text,
-                              tipeLink: false);
+                          if (phoneEdittingController.text.isEmpty) {
+                            showDialog<String>(
+                              // ignore: use_build_context_synchronously
+                              context: context,
+                              builder: (BuildContext context) => AlertDialog(
+                                title: Text(
+                                  'Atenção',
+                                  style: AppTextStyles.txtAlertTitle,
+                                ),
+                                content: Text(
+                                  'Necessário digitar o telefone com ddd antes!',
+                                  style: AppTextStyles.txtTextAlertHint,
+                                ),
+                                actions: <Widget>[
+                                  TextButton(
+                                    onPressed: () =>
+                                        Navigator.pop(context, 'OK'),
+                                    child: Text(
+                                      'OK',
+                                      style: AppTextStyles.txtTextForm,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          } else {
+                            _sendMessageController.sendMessageNoContact(
+                                ddi: _selectedValue,
+                                phoneNumber: phoneEdittingController.text,
+                                message: messageEdittingController.text,
+                                tipeLink: false);
+                          }
                         },
                       ),
                       const SizedBox(
@@ -174,8 +202,35 @@ class _SendMessageScreenState extends State<SendMessageScreen> {
                                   phoneNumber: phoneEdittingController.text,
                                   message: messageEdittingController.text,
                                   tipeLink: true);
-                          linkContactEdittingController.text =
-                              linkContact.toString();
+                          if (linkContact == null) {
+                            showDialog<String>(
+                              // ignore: use_build_context_synchronously
+                              context: context,
+                              builder: (BuildContext context) => AlertDialog(
+                                title: Text(
+                                  'Atenção',
+                                  style: AppTextStyles.txtAlertTitle,
+                                ),
+                                content: Text(
+                                  'Necessário digitar o telefone com ddd antes!',
+                                  style: AppTextStyles.txtTextAlertHint,
+                                ),
+                                actions: <Widget>[
+                                  TextButton(
+                                    onPressed: () =>
+                                        Navigator.pop(context, 'OK'),
+                                    child: Text(
+                                      'OK',
+                                      style: AppTextStyles.txtTextForm,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          } else {
+                            linkContactEdittingController.text =
+                                linkContact.toString();
+                          }
                         },
                       ),
                       const SizedBox(
@@ -188,6 +243,7 @@ class _SendMessageScreenState extends State<SendMessageScreen> {
               Column(
                 children: [
                   AppCustomTextField(
+                    enabled: false,
                     type: TextInputType.text,
                     textEditingController: linkContactEdittingController,
                   ),
@@ -199,8 +255,35 @@ class _SendMessageScreenState extends State<SendMessageScreen> {
                     color: AppColors.primary,
                     textoButtom: AppStrings.btnCopyLink,
                     width: 300,
-                    function: () => _sendMessageController
-                        .copyToClipboard(linkContactEdittingController.text),
+                    function: () {
+                      String response;
+                      if (phoneEdittingController.text.isEmpty) {
+                        response = 'Insira um telefone valido antes!';
+                      } else if (linkContactEdittingController.text.isEmpty) {
+                        response = 'Clique em criar link antes de copiar!';
+                      } else {
+                        response = 'Link copiado para area de transferencia';
+                        _sendMessageController.copyToClipboard(
+                            linkContactEdittingController.text);
+                      }
+                      // _sendMessageController
+                      //     .copyToClipboard(linkContactEdittingController.text);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(response),
+                          duration: const Duration(milliseconds: 3000),
+                          width: 320.0,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8.0,
+                            vertical: 8.0,
+                          ),
+                          behavior: SnackBarBehavior.floating,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(5.0),
+                          ),
+                        ),
+                      );
+                    },
                   ),
                 ],
               ),

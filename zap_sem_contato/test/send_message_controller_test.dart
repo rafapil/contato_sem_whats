@@ -1,9 +1,6 @@
-import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:url_launcher_platform_interface/url_launcher_platform_interface.dart';
-import 'package:whatsapp_unilink/whatsapp_unilink.dart';
 import 'package:zap_sem_contato/modules/controllers/send_message_controller.dart';
 // import 'package:zap_sem_contato/send_message_controller.dart';
 

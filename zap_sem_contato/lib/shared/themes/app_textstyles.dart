@@ -15,9 +15,20 @@ class AppTextStyles {
     color: AppColors.white,
   );
 
+  static final txtAlertTitle = GoogleFonts.notoSans(
+    fontSize: 22,
+    fontWeight: FontWeight.w700,
+    color: AppColors.black,
+  );
+
   static final txtTextForm = GoogleFonts.notoSans(
     fontSize: 16,
     fontWeight: FontWeight.w600,
+    color: AppColors.black,
+  );
+
+  static final txtTextAlertHint = GoogleFonts.notoSans(
+    fontSize: 14,
     color: AppColors.black,
   );
 
