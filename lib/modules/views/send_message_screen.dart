@@ -1,15 +1,13 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
-import 'package:zap_sem_contato/modules/controllers/recovery_countryes_controller.dart';
-import 'package:zap_sem_contato/modules/controllers/send_message_controller.dart';
-import 'package:zap_sem_contato/shared/themes/app_colors.dart';
-import 'package:zap_sem_contato/shared/themes/app_images.dart';
-import 'package:zap_sem_contato/shared/themes/app_textstyles.dart';
-import '../../shared/widgets/app_buttom.dart';
-import '../../shared/widgets/app_custom_multilinetext.dart';
-import '../../shared/widgets/app_custom_textfield.dart';
-import '../../shared/widgets/app_strings.dart';
+import 'package:provider/provider.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
+import '../controllers/link_generator_controller.dart';
+import '../controllers/export_controller.dart';
+import '../providers/links_provider.dart';
+import '../../shared/data/database_country.dart';
+import '../../shared/themes/app_colors.dart';
+import '../../shared/themes/app_strings.dart' as app_strings;
+import 'about_screen.dart';
 
 class SendMessageScreen extends StatefulWidget {
   const SendMessageScreen({super.key});
@@ -19,374 +17,433 @@ class SendMessageScreen extends StatefulWidget {
 }
 
 class _SendMessageScreenState extends State<SendMessageScreen> {
-  final SendMessageController _sendMessageController = SendMessageController();
-  final RecoveryCountryesController _recoveryCountryesController =
-      RecoveryCountryesController();
+  final LinkGeneratorController _linkController = LinkGeneratorController();
+  final ExportController _exportController = ExportController();
 
-  final TextEditingController _phoneEdittingController =
-      TextEditingController();
-  final TextEditingController _messageEdittingController =
-      TextEditingController();
-  final TextEditingController _linkContactEdittingController =
-      TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _messageController = TextEditingController();
+  final TextEditingController _linkDisplayController = TextEditingController();
 
-  String _selectedValue = '+55';
-  List<MenuItemButton> _countryMenuItems = [];
-  bool _isLoading = true;
+  String _selectedDdi = '+55';
+  String? _generatedLink;
+  bool _linkGenerated = false;
 
-  Future<void> _loadAndBuildItems() async {
-    await _recoveryCountryesController.listCountryes();
-    final itemsCountry = _recoveryCountryesController.countryesList;
-    final menuItems = itemsCountry
-        .map<MenuItemButton>((country) => MenuItemButton(
-              onPressed: () {
-                setState(() {
-                  _selectedValue = country['ddi'].toString();
-                });
-              },
-              child: Text(country['ddi'].toString()),
-            ))
-        .toList();
+  @override
+  void dispose() {
+    _phoneController.dispose();
+    _messageController.dispose();
+    _linkDisplayController.dispose();
+    super.dispose();
+  }
+
+  void _createLink() {
+    final phone = _phoneController.text;
+    if (!_linkController.validatePhone(phone)) {
+      _showSnackBar(app_strings.AppStrings.msgTelefoneObrigatorio);
+      return;
+    }
+
+    final link = _linkController.generateLink(
+      ddi: _selectedDdi,
+      phone: phone,
+      message: _messageController.text.isEmpty ? null : _messageController.text,
+    );
 
     setState(() {
-      _countryMenuItems = menuItems;
-      _isLoading = false;
+      _generatedLink = link;
+      _linkDisplayController.text = link;
+      _linkGenerated = true;
     });
   }
 
-  @override
-  void initState() {
-    super.initState();
-    _loadAndBuildItems();
+  Future<void> _openWhatsApp() async {
+    final phone = _phoneController.text;
+    if (!_linkController.validatePhone(phone)) {
+      _showSnackBar(app_strings.AppStrings.msgTelefoneObrigatorio);
+      return;
+    }
+
+    await _linkController.openWhatsApp(
+      ddi: _selectedDdi,
+      phone: phone,
+      message: _messageController.text.isEmpty ? null : _messageController.text,
+    );
+  }
+
+  Future<void> _copyLink() async {
+    if (_generatedLink == null) return;
+    await _linkController.copyToClipboard(_generatedLink!);
+    _showSnackBar(app_strings.AppStrings.msgLinkCopiado);
+  }
+
+  Future<void> _saveLink() async {
+    if (_generatedLink == null) {
+      _showSnackBar('Crie um link primeiro');
+      return;
+    }
+
+    final name = await _showNameDialog();
+    if (name != null && name.isNotEmpty && mounted) {
+      await context.read<LinksProvider>().saveLink(
+            name: name,
+            ddi: _selectedDdi,
+            phone: _phoneController.text,
+            message: _messageController.text.isEmpty ? null : _messageController.text,
+            link: _generatedLink!,
+          );
+      _showSnackBar(app_strings.AppStrings.msgLinkSalvo);
+    }
+  }
+
+  Future<String?> _showNameDialog() async {
+    final nameController = TextEditingController();
+    return showDialog<String>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(app_strings.AppStrings.dialogSalvarLink),
+        content: TextField(
+          controller: nameController,
+          decoration: InputDecoration(
+            labelText: app_strings.AppStrings.dialogNomeLink,
+            hintText: app_strings.AppStrings.dialogHintNomeLink,
+          ),
+          autofocus: true,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(app_strings.AppStrings.btnCancel),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, nameController.text),
+            child: Text(app_strings.AppStrings.btnOk),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _confirmClearAll() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(app_strings.AppStrings.msgConfirmarLimpar),
+        content: Text(app_strings.AppStrings.msgConfirmarLimparTodos),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text(app_strings.AppStrings.btnCancel),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.error),
+            onPressed: () => Navigator.pop(context, true),
+            child: Text(app_strings.AppStrings.btnExcluir),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true && mounted) {
+      await context.read<LinksProvider>().clearAllLinks();
+      _showSnackBar(app_strings.AppStrings.msgLinksLimpados);
+    }
+  }
+
+  void _showSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        duration: const Duration(seconds: 2),
+        behavior: SnackBarBehavior.floating,
+        width: 300,
+      ),
+    );
+  }
+
+  void _showAboutSheet() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => const AboutScreen(),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    final heightScreen = MediaQuery.sizeOf(context).height;
-    final widthScreen = MediaQuery.sizeOf(context).width;
-
-    // ignore: prefer_typing_uninitialized_variables
-    var linkContact;
-
     return Scaffold(
-      drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: [
-            DrawerHeader(
-              decoration: const BoxDecoration(
-                color: AppColors.black,
-              ),
-              child: Image.asset(
-                AppImages.logoImageApp,
-                height: 32,
-              ),
-            ),
-            ListTile(
-              title: Text(
-                AppStrings.menuAbout,
-                style: AppTextStyles.txtTextForm,
-              ),
-              onTap: () {
-                Navigator.pop(context);
-                Navigator.pushNamed(context, '/about');
-              },
-            ),
-            ListTile(
-              title: Text(
-                AppStrings.menuPrivacyPolicy,
-                style: AppTextStyles.txtTextForm,
-              ),
-              onTap: () {
-                Navigator.pop(context);
-                Navigator.pushNamed(context, '/privacy');
-              },
-            ),
-          ],
-        ),
-      ),
       appBar: AppBar(
-        backgroundColor: AppColors.black,
         title: Row(
           children: [
-            Image.asset(
-              AppImages.logoImageApp,
-              height: 32,
-            ),
-            const SizedBox(
-              width: 10,
-            ),
+            const Icon(Icons.chat, color: AppColors.white, size: 28),
+            const SizedBox(width: 10),
             Text(
-              AppStrings.appTitle,
-              style: AppTextStyles.txtTitleWhite,
-            )
+              app_strings.AppStrings.appTitle,
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: AppColors.white,
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.menu, color: AppColors.white),
+            onPressed: _showAboutSheet,
+          ),
+        ],
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            // DDI and Phone Row
+            Row(
+              children: [
+                // DDI Dropdown
+                Expanded(
+                  flex: 3,
+                  child: DropdownButtonFormField<String>(
+                    initialValue: _selectedDdi,
+                    decoration: const InputDecoration(
+                      contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                    ),
+                    items: _buildDdiItems(),
+                    onChanged: (value) {
+                      if (value != null) {
+                        setState(() => _selectedDdi = value);
+                      }
+                    },
+                  ),
+                ),
+                const SizedBox(width: 12),
+                // Phone field
+                Expanded(
+                  flex: 5,
+                  child: TextField(
+                    controller: _phoneController,
+                    keyboardType: TextInputType.phone,
+                    decoration: InputDecoration(
+                      labelText: app_strings.AppStrings.labelTelefone,
+                      hintText: app_strings.AppStrings.hintTelefone,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+
+            // Message field
+            TextField(
+              controller: _messageController,
+              keyboardType: TextInputType.text,
+              maxLength: 300,
+              decoration: InputDecoration(
+                labelText: app_strings.AppStrings.labelMensagem,
+                hintText: app_strings.AppStrings.hintMensagem,
+                counterText: '',
+              ),
+            ),
+            const SizedBox(height: 24),
+
+            // Action buttons row
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: _createLink,
+                    child: Text(app_strings.AppStrings.btnCriarLink),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: _openWhatsApp,
+                    child: Text(app_strings.AppStrings.btnAbrirWhatsApp),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 24),
+
+            // Link display and copy
+            if (_linkGenerated) ...[
+              TextField(
+                controller: _linkDisplayController,
+                enabled: true,
+                decoration: InputDecoration(
+                  suffixIcon: IconButton(
+                    icon: const Icon(Icons.copy),
+                    onPressed: _copyLink,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              OutlinedButton(
+                onPressed: _saveLink,
+                child: Text(app_strings.AppStrings.btnSalvarLink),
+              ),
+              const SizedBox(height: 32),
+            ],
+
+            // Saved Links Section
+            _buildSavedLinksSection(),
           ],
         ),
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16).copyWith(top: 16),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Text(
-                    AppStrings.insertNumberContact,
-                    style: AppTextStyles.txtTextForm,
-                  ),
-                ],
+    );
+  }
+
+  List<DropdownMenuItem<String>> _buildDdiItems() {
+    final countries = DatabaseCountry().countries.values.toList();
+    countries.sort((a, b) => a.ddi.compareTo(b.ddi));
+
+    return countries.map((c) {
+      return DropdownMenuItem<String>(
+        value: c.ddi,
+        child: Text(c.ddi),
+      );
+    }).toList();
+  }
+
+  Widget _buildSavedLinksSection() {
+    return Consumer<LinksProvider>(
+      builder: (context, linksProvider, child) {
+        if (!linksProvider.hasLinks) {
+          return Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 32),
+              child: Text(
+                app_strings.AppStrings.msgListaVazia,
+                style: const TextStyle(
+                  color: AppColors.textSecondary,
+                  fontSize: 14,
+                ),
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                mainAxisSize: MainAxisSize.max,
-                children: [
-                  SizedBox(
-                    width: widthScreen * 0.22,
-                    child: _isLoading
-                        ? const Center(child: CircularProgressIndicator())
-                        : MenuAnchor(
-                            alignmentOffset: const Offset(10, -8),
-                            style: MenuStyle(
-                              fixedSize: WidgetStatePropertyAll(
-                                Size.fromHeight(heightScreen * 0.3),
-                              ),
-                            ),
-                            menuChildren: _countryMenuItems,
-                            builder: (context, controller, child) {
-                              return TextButton(
-                                style: TextButton.styleFrom(
-                                  backgroundColor: Colors.white,
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 8.0, vertical: 12.0),
-                                  shape: RoundedRectangleBorder(
-                                    side: const BorderSide(
-                                      color: AppColors.primary,
-                                      width: 1,
-                                    ),
-                                    borderRadius: BorderRadius.circular(5),
-                                  ),
-                                  minimumSize: const Size.fromHeight(54),
-                                ),
-                                onPressed: () {
-                                  if (controller.isOpen) {
-                                    controller.close();
-                                  } else {
-                                    controller.open();
-                                  }
-                                },
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      _selectedValue,
-                                      style: const TextStyle(
-                                          fontSize: 16,
-                                          color: AppColors.black,
-                                          fontWeight: FontWeight.normal),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            },
-                          ),
+            ),
+          );
+        }
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  '${app_strings.AppStrings.sectionLinksSalvos} (${linksProvider.linksCount})',
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textPrimary,
                   ),
-                  const SizedBox(width: 5),
-                  SizedBox(
-                    width: widthScreen * 0.65,
-                    child: Padding(
-                      padding: const EdgeInsets.only(top: 20.0),
-                      child: AppCustomTextField(
-                        textEditingController: _phoneEdittingController,
-                        hint: AppStrings.hintTextPhoneCall,
-                        type: TextInputType.phone,
-                        maxLength: 20,
-                      ),
+                ),
+                TextButton(
+                  onPressed: _confirmClearAll,
+                  child: Text(
+                    app_strings.AppStrings.btnLimparLinks,
+                    style: const TextStyle(
+                      color: AppColors.error,
+                      fontSize: 14,
                     ),
                   ),
-                ],
-              ),
-              SizedBox(
-                height: heightScreen * 0.02,
-              ),
-              AppCustomMultilinetext(
-                type: TextInputType.multiline,
-                hint: AppStrings.hintMessageNotrequired,
-                titulo: AppStrings.titleMessageNotrequired,
-                textEditingController: _messageEdittingController,
-              ),
-              const SizedBox(
-                height: 30,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Column(
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            ListView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: linksProvider.links.length,
+              itemBuilder: (context, index) {
+                final link = linksProvider.links[index];
+                return Slidable(
+                  key: Key(link.id),
+                  endActionPane: ActionPane(
+                    motion: const ScrollMotion(),
                     children: [
-                      AppButtom(
-                        buttomStyle: AppTextStyles.txtButtomWhite,
-                        color: AppColors.primary,
-                        textoButtom: AppStrings.btnCallContact,
-                        width: 300,
-                        function: () {
-                          if (_phoneEdittingController.text.isEmpty) {
-                            showDialog<String>(
-                              context: context,
-                              builder: (BuildContext context) => AlertDialog(
-                                title: Text(
-                                  'Atenção',
-                                  style: AppTextStyles.txtAlertTitle,
-                                ),
-                                content: Text(
-                                  'Necessário digitar o telefone com ddd antes!',
-                                  style: AppTextStyles.txtTextAlertHint,
-                                ),
-                                actions: <Widget>[
-                                  TextButton(
-                                    onPressed: () =>
-                                        Navigator.pop(context, 'OK'),
-                                    child: Text(
-                                      'OK',
-                                      style: AppTextStyles.txtTextForm,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            );
-                          } else {
-                            _sendMessageController.sendMessageNoContact(
-                                ddi: _selectedValue,
-                                phoneNumber: _phoneEdittingController.text,
-                                message: _messageEdittingController.text,
-                                tipeLink: false);
-                          }
-                        },
-                      ),
-                      SizedBox(
-                        height: heightScreen * 0.02,
-                      ),
-                      AppButtom(
-                        buttomStyle: AppTextStyles.txtButtomWhite,
-                        color: AppColors.primary,
-                        textoButtom: AppStrings.btnLinkContact,
-                        width: 300,
-                        function: () async {
-                          linkContact =
-                              await _sendMessageController.sendMessageNoContact(
-                                  ddi: _selectedValue,
-                                  phoneNumber: _phoneEdittingController.text,
-                                  message: _messageEdittingController.text,
-                                  tipeLink: true);
-                          if (linkContact == null) {
-                            showDialog<String>(
-                              // ignore: use_build_context_synchronously
-                              context: context,
-                              builder: (BuildContext context) => AlertDialog(
-                                title: Text(
-                                  'Atenção',
-                                  style: AppTextStyles.txtAlertTitle,
-                                ),
-                                content: Text(
-                                  'Necessário digitar o telefone com ddd antes!',
-                                  style: AppTextStyles.txtTextAlertHint,
-                                ),
-                                actions: <Widget>[
-                                  TextButton(
-                                    onPressed: () =>
-                                        Navigator.pop(context, 'OK'),
-                                    child: Text(
-                                      'OK',
-                                      style: AppTextStyles.txtTextForm,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            );
-                          } else {
-                            _linkContactEdittingController.text =
-                                linkContact.toString();
-                          }
-                        },
-                      ),
-                      SizedBox(
-                        height: heightScreen * 0.03,
+                      SlidableAction(
+                        onPressed: (_) => linksProvider.deleteLink(link.id),
+                        backgroundColor: AppColors.error,
+                        foregroundColor: AppColors.white,
+                        icon: Icons.delete,
+                        label: app_strings.AppStrings.btnExcluir,
                       ),
                     ],
                   ),
-                ],
-              ),
-              Column(
-                children: [
-                  AppCustomTextField(
-                    enabled: false,
-                    type: TextInputType.text,
-                    textEditingController: _linkContactEdittingController,
-                  ),
-                  SizedBox(
-                    height: heightScreen * 0.02,
-                  ),
-                  AppButtom(
-                    buttomStyle: AppTextStyles.txtButtomWhite,
-                    color: AppColors.primary,
-                    textoButtom: AppStrings.btnCopyLink,
-                    width: 300,
-                    function: () {
-                      String response;
-                      if (_phoneEdittingController.text.isEmpty) {
-                        response = 'Insira um telefone valido antes!';
-                      } else if (_linkContactEdittingController.text.isEmpty) {
-                        response = 'Clique em criar link antes de copiar!';
-                      } else {
-                        response = 'Link copiado para area de transferencia';
-                        _sendMessageController.copyToClipboard(
-                            _linkContactEdittingController.text);
-                      }
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(
-                            response,
-                            textAlign: TextAlign.center,
+                  child: Card(
+                    margin: const EdgeInsets.only(bottom: 8),
+                    child: ListTile(
+                      title: Text(
+                        link.name,
+                        style: const TextStyle(fontWeight: FontWeight.w500),
+                      ),
+                      subtitle: Text(
+                        '${link.maskedPhone}${link.messagePreview.isNotEmpty ? ' - ${link.messagePreview}' : ''}',
+                        style: const TextStyle(fontSize: 12),
+                      ),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            icon: const Icon(Icons.copy, size: 20),
+                            onPressed: () async {
+                              await _linkController.copyToClipboard(link.link);
+                              _showSnackBar(app_strings.AppStrings.msgLinkCopiado);
+                            },
                           ),
-                          duration: const Duration(milliseconds: 3000),
-                          width: 320.0,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8.0,
-                            vertical: 8.0,
+                          IconButton(
+                            icon: const Icon(Icons.open_in_new, size: 20),
+                            onPressed: () async {
+                              await _linkController.openWhatsApp(
+                                ddi: link.ddi,
+                                phone: link.phone,
+                                message: link.message,
+                              );
+                            },
                           ),
-                          behavior: SnackBarBehavior.floating,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(5.0),
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                ],
-              ),
-              SizedBox(
-                height: heightScreen * 0.16,
-              )
-            ],
-          ),
-        ),
-      ),
-      bottomNavigationBar: Platform.isAndroid
-          ? Padding(
-              padding: const EdgeInsets.only(left: 8, bottom: 50),
-              child: Row(
-                children: [
-                  TextButton(
-                    onPressed: () => _sendMessageController
-                        .redirectUrl(AppStrings.linkVaquinha),
-                    child: Text(
-                      AppStrings.btnDonate,
-                      style: AppTextStyles.txtTextLink,
+                        ],
+                      ),
+                      onTap: () {
+                        setState(() {
+                          _selectedDdi = link.ddi;
+                          _phoneController.text = link.phone;
+                          _messageController.text = link.message ?? '';
+                          _generatedLink = link.link;
+                          _linkDisplayController.text = link.link;
+                          _linkGenerated = true;
+                        });
+                      },
                     ),
                   ),
-                ],
-              ),
-            )
-          : null,
+                );
+              },
+            ),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: () => _exportController.exportToXls(linksProvider.links),
+                    icon: const Icon(Icons.table_chart),
+                    label: Text(app_strings.AppStrings.btnExportarXls),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: () => _exportController.exportToCsv(linksProvider.links),
+                    icon: const Icon(Icons.description),
+                    label: Text(app_strings.AppStrings.btnExportarCsv),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        );
+      },
     );
   }
 }

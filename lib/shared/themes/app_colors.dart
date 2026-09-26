@@ -1,13 +1,22 @@
 import 'package:flutter/material.dart';
 
 class AppColors {
-  static const primary = Color.fromARGB(255, 64, 84, 42);
+  // WhatsApp Green Palette
+  static const primary = Color(0xFF25D366);
+  static const primaryDark = Color(0xFF128C7E);
+  static const primaryLight = Color(0xFF9CF0FF);
 
-  static const white = Color.fromARGB(240, 255, 255, 255);
+  // Background & Surface
+  static const background = Color(0xFFFFFFFF);
+  static const surface = Color(0xFFF5F5F5);
+  static const surfaceContainer = Color(0xFFF0F0F0);
 
-  static const grey = Colors.grey;
+  // Text
+  static const textPrimary = Color(0xFF1F2D3D);
+  static const textSecondary = Color(0xFF6C757D);
 
-  static const black = Colors.black87;
-
-  static const background = Color(0xFFfffff6);
+  // Utility
+  static const error = Color(0xFFDC3545);
+  static const white = Color(0xFFFFFFFF);
+  static const black = Color(0xFF000000);
 }

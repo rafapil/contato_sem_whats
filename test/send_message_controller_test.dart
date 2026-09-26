@@ -1,15 +1,18 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:url_launcher_platform_interface/url_launcher_platform_interface.dart';
+import 'package:zap_sem_contato/modules/controllers/send_message_controller.dart';
 // import 'package:zap_sem_contato/send_message_controller.dart';
 
 // Mock para o URL Launcher
 class MockUrlLauncher extends Mock implements UrlLauncherPlatform {}
 
 void main() {
+  late SendMessageController controller;
   late MockUrlLauncher mockUrlLauncher;
 
   setUp(() {
+    controller = SendMessageController();
     mockUrlLauncher = MockUrlLauncher();
     UrlLauncherPlatform.instance = mockUrlLauncher;
   });

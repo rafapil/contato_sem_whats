@@ -1,5 +1,5 @@
 class AppStrings {
-  static String appTitle = 'Whats sem salvar contato';
+  static String appTitle = 'Zap Sem Contato';
   static String insertNumberContact = 'Insira o número para contato';
   static String hintTextPhoneCall = 'Digite o ddd + telefone';
   static String hintMessageNotrequired = 'Mensagem não obrigatorio!';
@@ -10,10 +10,4 @@ class AppStrings {
   static String btnDonate = 'Ajude a realizar nosso sonho!';
   static String pixKeyText = '5048986@vakinha.com.br';
   static String linkVaquinha = 'https://www.vakinha.com.br/5048986';
-  static String menuAbout = 'Sobre';
-  static String menuPrivacyPolicy = 'Política de Privacidade';
-  static String titleAbout = 'Sobre';
-  static String titlePrivacyPolicy = 'Política de Privacidade';
-  static String aboutContent = 'App para enviar WhatsApp sem salvar contato.';
-  static String privacyPolicyContent = 'Não coletamos dados pessoais dos usuários.';
 }

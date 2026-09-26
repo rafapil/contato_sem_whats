@@ -4,7 +4,6 @@ import 'package:whatsapp_unilink/whatsapp_unilink.dart';
 
 class SendMessageController {
   Future<dynamic> sendMessageNoContact(
-      // ignore: strict_top_level_inference
       {ddi, phoneNumber, message, tipeLink}) async {
     if (phoneNumber.length > 6) {
       String comprelePhoneNumber = ddi + phoneNumber;

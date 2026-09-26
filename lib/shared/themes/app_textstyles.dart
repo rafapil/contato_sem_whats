@@ -1,50 +1,96 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'app_colors.dart';
 
 class AppTextStyles {
-  static final txtButtomWhite = TextStyle(
-    fontFamily: 'NotoSans',
+  static final txtButtomWhite = GoogleFonts.inter(
     fontSize: 14,
-    fontWeight: FontWeight.w700,
-    color: AppColors.white,
-  );
-
-  static final txtTitleWhite = TextStyle(
-    fontFamily: 'NotoSans',
-    fontSize: 16,
     fontWeight: FontWeight.w600,
     color: AppColors.white,
   );
 
-  static final txtAlertTitle = TextStyle(
-    fontFamily: 'NotoSans',
+  static final txtTitleWhite = GoogleFonts.inter(
+    fontSize: 20,
+    fontWeight: FontWeight.w600,
+    color: AppColors.white,
+  );
+
+  static final txtAppBarTitle = GoogleFonts.inter(
+    fontSize: 18,
+    fontWeight: FontWeight.w600,
+    color: AppColors.white,
+  );
+
+  static final txtSectionHeader = GoogleFonts.inter(
+    fontSize: 14,
+    fontWeight: FontWeight.w600,
+    color: AppColors.textPrimary,
+  );
+
+  static final txtBody = GoogleFonts.inter(
+    fontSize: 16,
+    fontWeight: FontWeight.w400,
+    color: AppColors.textPrimary,
+  );
+
+  static final txtCaption = GoogleFonts.inter(
+    fontSize: 12,
+    fontWeight: FontWeight.w400,
+    color: AppColors.textSecondary,
+  );
+
+  static final txtFormField = GoogleFonts.inter(
+    fontSize: 16,
+    fontWeight: FontWeight.w400,
+    color: AppColors.textPrimary,
+  );
+
+  static final txtFormHint = GoogleFonts.inter(
+    fontSize: 14,
+    fontWeight: FontWeight.w400,
+    color: AppColors.textSecondary,
+  );
+
+  static final txtButtonPrimary = GoogleFonts.inter(
+    fontSize: 14,
+    fontWeight: FontWeight.w600,
+    color: AppColors.white,
+  );
+
+  static final txtButtonOutlined = GoogleFonts.inter(
+    fontSize: 14,
+    fontWeight: FontWeight.w600,
+    color: AppColors.primary,
+  );
+
+  static final txtLink = GoogleFonts.inter(
+    fontSize: 14,
+    fontWeight: FontWeight.w500,
+    color: AppColors.primary,
+  );
+
+  static final txtError = GoogleFonts.inter(
+    fontSize: 12,
+    fontWeight: FontWeight.w400,
+    color: AppColors.error,
+  );
+
+  static final txtAlertTitle = GoogleFonts.inter(
+    fontSize: 18,
+    fontWeight: FontWeight.w600,
+    color: AppColors.textPrimary,
+  );
+
+  static final txtAboutTitle = GoogleFonts.inter(
     fontSize: 22,
     fontWeight: FontWeight.w700,
-    color: AppColors.black,
+    color: AppColors.textPrimary,
   );
 
-  static final txtTextForm = TextStyle(
-    fontFamily: 'NotoSans',
-    fontSize: 16,
-    fontWeight: FontWeight.w600,
-    color: AppColors.black,
-  );
-
-  static final txtTextAlertHint = TextStyle(
-    fontFamily: 'NotoSans',
+  static final txtAboutBody = GoogleFonts.inter(
     fontSize: 14,
-    color: AppColors.black,
-  );
-
-  static final txtTextFormHint = TextStyle(
-    fontFamily: 'NotoSans',
-    fontSize: 12,
-    color: AppColors.black,
-  );
-
-  static final txtTextLink = TextStyle(
-    fontFamily: 'NotoSans',
-    fontSize: 12,
-    color: AppColors.primary,
+    fontWeight: FontWeight.w400,
+    color: AppColors.textPrimary,
+    height: 1.5,
   );
 }
