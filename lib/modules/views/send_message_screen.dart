@@ -4,6 +4,7 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import '../controllers/link_generator_controller.dart';
 import '../controllers/export_controller.dart';
 import '../providers/links_provider.dart';
+import '../services/whats_app_launcher_service.dart';
 import '../../shared/data/database_country.dart';
 import '../../shared/themes/app_colors.dart';
 import '../../shared/themes/app_strings.dart' as app_strings;
@@ -19,6 +20,7 @@ class SendMessageScreen extends StatefulWidget {
 class _SendMessageScreenState extends State<SendMessageScreen> {
   final LinkGeneratorController _linkController = LinkGeneratorController();
   final ExportController _exportController = ExportController();
+  final WhatsAppLauncherService _whatsAppLauncher = WhatsAppLauncherService();
 
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _messageController = TextEditingController();
@@ -63,10 +65,51 @@ class _SendMessageScreenState extends State<SendMessageScreen> {
       return;
     }
 
-    await _linkController.openWhatsApp(
+    final selectedType = await _showWhatsAppSelectorDialog();
+    if (selectedType == null) return; // cancelado
+
+    await _whatsAppLauncher.openWhatsApp(
       ddi: _selectedDdi,
       phone: phone,
       message: _messageController.text.isEmpty ? null : _messageController.text,
+      type: selectedType,
+    );
+  }
+
+  Future<WhatsAppType?> _showWhatsAppSelectorDialog() async {
+    return showModalBottomSheet<WhatsAppType>(
+      context: context,
+      builder: (context) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Text(
+                app_strings.AppStrings.dialogSelecionarWhatsApp,
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.chat),
+              title: Text(app_strings.AppStrings.optionWhatsAppNormal),
+              onTap: () => Navigator.pop(context, WhatsAppType.normal),
+            ),
+            ListTile(
+              leading: const Icon(Icons.business),
+              title: Text(app_strings.AppStrings.optionWhatsAppBusiness),
+              onTap: () => Navigator.pop(context, WhatsAppType.business),
+            ),
+            const Divider(),
+            ListTile(
+              leading: const Icon(Icons.close),
+              title: Text(app_strings.AppStrings.btnCancel),
+              onTap: () => Navigator.pop(context),
+            ),
+            const SizedBox(height: 16),
+          ],
+        ),
+      ),
     );
   }
 
@@ -397,10 +440,13 @@ class _SendMessageScreenState extends State<SendMessageScreen> {
                           IconButton(
                             icon: const Icon(Icons.open_in_new, size: 20),
                             onPressed: () async {
-                              await _linkController.openWhatsApp(
+                              final selectedType = await _showWhatsAppSelectorDialog();
+                              if (selectedType == null) return;
+                              await _whatsAppLauncher.openWhatsApp(
                                 ddi: link.ddi,
                                 phone: link.phone,
                                 message: link.message,
+                                type: selectedType,
                               );
                             },
                           ),

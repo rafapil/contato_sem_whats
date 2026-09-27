@@ -1,5 +1,4 @@
 import 'package:flutter/services.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:whatsapp_unilink/whatsapp_unilink.dart';
 
 class LinkGeneratorController {
@@ -26,31 +25,6 @@ class LinkGeneratorController {
 
     _generatedLink = link.asUri().toString();
     return _generatedLink!;
-  }
-
-  Future<bool> openWhatsApp({
-    required String ddi,
-    required String phone,
-    String? message,
-  }) async {
-    if (phone.isEmpty || phone.length < 7) {
-      return false;
-    }
-
-    final cleanPhone = phone.replaceAll(RegExp(r'[^\d]'), '');
-    final fullPhone = '$ddi$cleanPhone';
-
-    final link = WhatsAppUnilink(
-      phoneNumber: fullPhone,
-      text: message,
-    );
-
-    try {
-      await launchUrl(link.asUri(), mode: LaunchMode.externalApplication);
-      return true;
-    } catch (e) {
-      return false;
-    }
   }
 
   Future<void> copyToClipboard(String text) async {

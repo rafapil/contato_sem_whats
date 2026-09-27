@@ -41,6 +41,9 @@ class AppStrings {
   static const dialogSalvarLink = 'Salvar Link';
   static const dialogNomeLink = 'Nome do link';
   static const dialogHintNomeLink = 'Ex: Contato - Maria';
+  static const dialogSelecionarWhatsApp = 'Qual WhatsApp deseja abrir?';
+  static const optionWhatsAppNormal = 'WhatsApp Normal';
+  static const optionWhatsAppBusiness = 'WhatsApp Business';
 
   // About content
   static const aboutDescricao = 'Zap sem Contato é um aplicativo para criar links wa.me do WhatsApp sem adicionar o contato. Permite criar, salvar e exportar links de forma rápida e segura.\n\nTodos os dados ficam armazenados apenas no seu dispositivo.';
